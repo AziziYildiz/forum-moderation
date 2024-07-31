@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Admin Users</title>
+    <link rel="stylesheet" href="../static/admin.css">
+</head>
+<body>
+
+    <div class="sidebar">
+        <a href="/" class="logo-btn">
+            <button class="logo-btn">
+                <img src="/static/images/logok-rm-z-5copy-1.png" alt="Admin Dashboard">
+            </button>
+        </a>
+        <button class="toggle-btn shared-background" onclick="toggleNotifications()">Toggle Notifications</button>
+
+        <div class="notification-area" style="display: none;">
+            <h3>Notifications</h3>
+            <ul>
+                <li>    
+                    <a href="/admin?view=moderation_requests">
+                        <button class="notification-btn">
+                            Request for Moderation 
+                            <span id="moderation-count">{{len .ModerationRequests}}</span>
+                        </button>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin?view=post_reports">
+                        <button class="notification-btn">
+                            Moderator report 
+                            <span id="post-sharing-count">{{len .Reports}}</span>
+                        </button>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <ul>
+            <li><a href="/admin?view=users" class="shared-background">Users</a></li>
+            <li><a href="/admin?view=posts" class="shared-background">Posts</a></li>
+            <li><a href="/admin?view=comments" class="shared-background1">Comments</a></li>
+        </ul>
+    </div>
+    <div class="content">
+        <h1>Admin Users</h1>
+
+        <div id="users-section" class="section">
+            <h2>Users</h2>
+            {{if .Users}}
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Icon</th>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>About</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+                {{range .Users}}
+                <tr>
+                    <td>{{.ID}}</td>
+                    <td>
+                        <img class="user-icon" src="{{if .UserIconURL.Valid}}{{.UserIconURL.String}}{{else}}/static/images/vector-1.png{{end}}" alt="User Icon">
+                    </td>
+                    <td>{{.Username}}</td>
+                    <td>{{if .Name.Valid}}{{.Name.String}}{{else}}-----{{end}}</td>
+                    <td>{{if .About.Valid}}{{.About.String}}{{else}}-----{{end}}</td>
+                    <td>{{.Email}}</td>
+                    <td>{{.Role}}</td>
+                    <td>
+                        <form method="POST" action="/delete">
+                            <input type="hidden" name="id" value="{{.ID}}">
+                            <input type="hidden" name="action" value="delete_user">
+                            <button type="submit" class="delete-btn">Delete</button>
+                        </form>
+                        <!-- <a href="/admin_edit?action=edit_user&id={{.ID}}" class="edit-btn">Edit</a> -->
+                    </td>
+                </tr>
+                {{end}}
+            </table>
+            {{else}}
+            <p>No users found.</p>
+            {{end}}
+        </div>
+    </div>
+    <script>
+        function toggleNotifications() {
+            var notificationArea = document.querySelector('.notification-area');
+            if (notificationArea.style.display === 'none' || notificationArea.style.display === '') {
+                notificationArea.style.display = 'block';
+                updateNotificationCounts(); // Bildirim sayılarını güncelle
+            } else {
+                notificationArea.style.display = 'none';
+            }
+        }
+
+        function updateNotificationCounts() {
+            fetch('/admin?view=notification_counts')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('moderation-count').textContent = data.moderationRequestsCount;
+                    document.getElementById('post-sharing-count').textContent = data.postReportsCount;
+                })
+                .catch(error => console.error('Error fetching notification counts:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sayfa yüklendiğinde bildirim sayılarını güncelle
+            updateNotificationCounts();
+        });
+    </script>
+</body>
+</html>

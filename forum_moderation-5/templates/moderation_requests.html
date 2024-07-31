@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="../static/admin.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .section {
+            margin-bottom: 30px;
+            margin-left: 363px; 
+            width: 75%; 
+        }
+        .section h2 {
+            background-color: #f2f2f2;
+            padding: 10px;
+            border-radius: 5px;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        form {
+            display: inline;
+        }
+        .logo-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        .logo-btn img {
+            width: 170px; /* Adjust the size as needed */
+            height: 107px;
+            left: -17px;
+            position: relative;
+        }
+        .notification-area {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="/" class="logo-btn">
+            <button class="logo-btn">
+                <img src="/static/images/logok-rm-z-5copy-1.png" alt="Admin Dashboard">
+            </button>
+        </a>
+        <button class="toggle-btn shared-background" onclick="toggleNotifications()">Toggle Notifications</button>
+        <div class="notification-area">
+            <h3>Notifications</h3>
+            <ul>
+                <li>
+                    <button class="notification-btn" onclick="showModerationRequests()">
+                        Request for Moderation 
+                        <span id="moderation-count">{{len .ModerationRequests}}</span>
+                    </button>
+                </li>
+                <li>
+                    <button class="notification-btn" onclick="redirectToPostReports()">
+                        Moderator report 
+                        <span id="post-sharing-count">{{len .Reports}}</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <ul>
+            <li><a href="/admin?view=users" class="shared-background">Users</a></li>
+            <li><a href="/admin?view=posts" class="shared-background">Posts</a></li>
+            <li><a href="/admin?view=comments" class="shared-background1">Comments</a></li>
+        </ul>
+    </div>
+    <div id="moderation-requests-section" class="section" style="display:none;">
+        <h2>Moderation Requests</h2>
+        {{if .ModerationRequests}}
+        <table>
+            <tr>
+                <th>UserID</th>
+                <th>Username</th>
+                <th>Message</th>
+                <th>Created At</th>
+                <th>Role</th>
+            </tr>
+            {{range .ModerationRequests}}
+            <tr>
+                <td>{{.UserID}}</td>
+                <td>{{.Username}}</td>
+                <td>{{.Message}}</td>
+                <td class="created-at">{{.CreatedAt}}</td>
+                <td>
+                    <form onsubmit="handleSubmit(event)">
+                        <input type="hidden" name="userId" value="{{.UserID}}">
+                        <select name="newRole">
+                            <option value="user">User</option>
+                            <option value="moderator">Moderator</option>
+                        </select>
+                        <button type="submit">Update Role</button>
+                    </form>
+                </td>
+            </tr>
+            {{end}}
+        </table>
+        {{else}}
+        <p>No moderation requests found.</p>
+        {{end}}
+    </div>
+    <script>
+        function toggleNotifications() {
+            var notificationArea = document.querySelector('.notification-area');
+            if (notificationArea.style.display === 'none' || notificationArea.style.display === '') {
+                notificationArea.style.display = 'block';
+            } else {
+                notificationArea.style.display = 'none';
+            }
+        }
+
+        function showModerationRequests() {
+            var moderationRequestsSection = document.getElementById('moderation-requests-section');
+            if (moderationRequestsSection.style.display === 'none' || moderationRequestsSection.style.display === '') {
+                moderationRequestsSection.style.display = 'block';
+            } else {
+                moderationRequestsSection.style.display = 'none';
+            }
+        }
+
+        function redirectToPostReports() {
+            window.location.href = '/admin?view=post_reports';
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();  // Formun normal submit işlemini engelle
+            const form = event.target;
+            const data = new FormData(form);
+
+            // Kullanıcıdan onay al
+            if (!confirm('Are you sure you want to update the role?')) {
+                return; // Kullanıcı iptal ederse işlemi durdur
+            }
+
+            fetch('/changeUserRole', {
+                method: 'POST',
+                body: data
+            }).then(response => response.json())  // JSON olarak yanıt al
+            .then(data => {
+                if (data.success) {
+                    const updatedRow = form.closest('tr');  // Güncellenen satırı bul
+                    updatedRow.cells[4].textContent = form.newRole.value;  // Rol sütununu güncelle
+                    alert('Role updated successfully!');
+                    // Sayıyı güncelle
+                    document.getElementById('moderation-count').innerText = parseInt(document.getElementById('moderation-count').innerText) - 1;
+                } else {
+                    alert('Failed to update role: ' + data.error);
+                }
+            }).catch(error => console.error('Error:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tarih-zaman değerlerini al
+            var dateTimeElements = document.querySelectorAll('.created-at');
+            dateTimeElements.forEach(function(element) {
+                var fullDateTime = element.textContent; // "2024-07-27 23:23:28.890788393 +0300 +0300" gibi bir değer olabilir
+                var cleanDateTime = fullDateTime.split('.')[0]; // Noktadan önceki kısmı alır
+                element.textContent = cleanDateTime; // Elementin içeriğini günceller
+            });
+        });
+    </script>    
+</body>
+</html>

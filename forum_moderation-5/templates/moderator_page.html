@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderator Page</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background: #f4f4f4;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px; /* Space below the table */
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .post-image {
+            width: 100px;
+            height: auto;
+        }
+
+        .toggle-btn {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #555;
+            color: white;
+            cursor: pointer;
+        }
+
+        .toggle-btn:hover {
+            background-color: #666;
+        }
+
+        .shared-background {
+            background-color: #555;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100px;
+            }
+            .main-content {
+                margin-left: 110px;
+            }
+        }
+                
+               
+        .approve-btn {
+            padding: 8px 15px; 
+            border: none; 
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            transition: background-color 0.3s; 
+            top: -7px;
+            left: 2px;
+            position: relative;
+        }
+
+        
+        .approve-btn {
+            background-color: #4CAF50; 
+        }
+
+        .reject-btn {
+            padding: 8px 15px; 
+            border: none; 
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            transition: background-color 0.3s; 
+            top: 8px;
+            left: 2px;
+            position: relative;
+            width: 87px;
+        }
+      
+        .reject-btn {
+            background-color: #f44336; 
+        }
+
+      
+        .approve-btn:hover, .reject-btn:hover {
+            opacity: 0.85; 
+        }
+        .logo-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        margin: 20px 0;
+        }
+
+        .logo-btn img {
+            width: 139px; /* Adjust the size as needed */
+            height: 87px;
+            left: -17px;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="/" class="logo-btn">
+            <button class="logo-btn">
+                <img src="/static/images/logok-rm-z-5copy-1.png" alt="Admin Dashboard">
+            </button>
+        </a>
+        <button class="toggle-btn shared-background" onclick="toggleVisibility('pending')">Pending Posts</button>
+        <button class="toggle-btn shared-background" onclick="toggleVisibility('approved')">Approved Posts</button>
+        <button class="toggle-btn shared-background" onclick="toggleVisibility('rejected')">Rejected Posts</button>
+    </div>
+    <div class="main-content">
+        <div class="posts" id="pending">
+            <h2>Pending Posts</h2>
+            {{if .PendingPosts}}
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Username</th>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Categories</th>
+                    <th>Action</th>
+                </tr>
+                {{range .PendingPosts}}
+                <tr>
+                    <td>{{.AuthorID}}</td>
+                    <td><img class="post-image" src="{{.ImageURL}}" alt="Post Image"></td>
+                    <td>{{.AuthorName}}</td>
+                    <td>{{.Title}}</td>
+                    <td>{{.Content}}</td>
+                    <td>{{if .Category.Valid}}{{.Category.String}}{{else}}None{{end}}</td>
+                    <td>
+                        <form method="POST" action="/approve">
+                            <input type="hidden" name="id" value="{{.ID}}">
+                            <button type="submit" class="approve-btn">Approve</button>
+                        </form>
+                        <form method="POST" action="/reject">
+                            <input type="hidden" name="id" value="{{.ID}}">
+                            <button type="submit" class="reject-btn">Reject</button>
+                        </form>
+                    </td>        
+                </tr>
+                {{end}}
+            </table>
+            {{else}}
+            <p>No posts found.</p>
+            {{end}}
+        </div>
+        <div class="posts" id="approved" style="display:none;">
+            <h2>Approved Posts</h2>
+            {{if .ApprovedPosts}}
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Username</th>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Categories</th>
+                </tr>
+                {{range .ApprovedPosts}}
+                <tr>
+                    <td>{{.AuthorID}}</td>
+                    <td><img class="post-image" src="{{.ImageURL}}" alt="Post Image"></td>
+                    <td>{{.AuthorName}}</td>
+                    <td>{{.Title}}</td>
+                    <td>{{.Content}}</td>
+                    <td>{{if .Category.Valid}}{{.Category.String}}{{else}}None{{end}}</td>    
+                </tr>
+                {{end}}
+            </table>
+            {{else}}
+            <p>No posts found.</p>
+            {{end}}
+        </div>
+        <div class="posts" id="rejected" style="display:none;">
+            <h2>Rejected Posts</h2>
+            {{if .RejectedPosts}}
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Username</th>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Categories</th>
+                </tr>
+                {{range .RejectedPosts}}
+                <tr>
+                    <td>{{.AuthorID}}</td>
+                    <td><img class="post-image" src="{{.ImageURL}}" alt="Post Image"></td>
+                    <td>{{.AuthorName}}</td>
+                    <td>{{.Title}}</td>
+                    <td>{{.Content}}</td>
+                    <td>{{if .Category.Valid}}{{.Category.String}}{{else}}None{{end}}</td>    
+                </tr>
+                {{end}}
+            </table>
+            {{else}}
+            <p>No posts found.</p>
+            {{end}}
+        </div>
+    </div>
+    <script>
+        function toggleVisibility(sectionId) {
+            const sections = ['pending', 'approved', 'rejected'];
+            sections.forEach(section => {
+                document.getElementById(section).style.display = (section === sectionId) ? 'block' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>

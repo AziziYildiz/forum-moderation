@@ -1,0 +1,187 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+}
+.logo-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    margin: 20px 0;
+}
+
+.logo-btn img {
+    width: 170px; /* Adjust the size as needed */
+    height: 107x;
+    left: -17px;
+    position: relative;
+}
+
+.sidebar {
+    width: 20%;
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    overflow-y: auto;
+    height: 100vh; /* Sabit yükseklik */
+    display: flex;
+    flex-direction: column;
+    position: fixed; /* Sabit pozisyon */
+    top: 0; /* Üstten başla */
+    left: 0; /* Soldan başla */
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+.sidebar ul li {
+    margin-bottom: 20px;
+}
+.sidebar ul li a {
+    display: block;
+    padding: -8px;
+    text-decoration: none;
+    font-size: 15px;
+}
+.section {
+    margin-bottom: 30px;
+}
+.section h2 {
+    background-color: #f2f2f2;
+    padding: 10px;
+    border-radius: 5px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+.content {
+    width: 80%;
+    padding: 20px;
+    overflow-y: auto;
+    margin-left: 23%; /* Sidebar genişliği kadar sol taraftan boşluk */
+}
+.posts-content {
+    overflow-y: auto;
+    height: calc(100vh - 60px); /* 60px, Admin Dashboard başlık yüksekliği */
+}
+.post-image {
+    width: 100px;
+    height: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+table, th, td {
+    border: 1px solid #ddd;
+}
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}
+.user-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+.delete-btn {
+    color: red;
+    cursor: pointer;
+}
+.edit-btn {
+    background-color: #a04545;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.edit-btn:hover {
+    background-color: #a04545;
+}
+.notification-area {
+    margin-top: 20px;
+    background-color: #444;
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+}
+.notification-area h3 {
+    color: #fff;
+}
+.notification-area ul {
+    list-style: none;
+    padding: 0;
+}
+.notification-area button {
+    width: 147%;
+    background-color: #555;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: left;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+.notification-area button:hover {
+    background-color: #666;
+}
+.notification-area li {
+    color: #ffdead;
+    padding: 5px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.notification-area li span {
+    background-color: #ff6347;
+    padding: 2px 6px;
+    border-radius: 50%;
+}
+.shared-background {
+    background-color: #555;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    height: 40px;
+    width: 100%;
+}
+.shared-background:hover {
+    background-color: #666;
+}
+.shared-background1 {
+    background-color: #555;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    height: 40px;
+    width: 100%;
+    position: relative;
+    top: 1px;
+    line-height: 40px
+    
+}
+.shared-background1:hover {
+    background-color: #666;
+}
+.toggle-btn {
+    padding: 10px;
+    border: none;
+    margin-bottom: 10px;
+}
